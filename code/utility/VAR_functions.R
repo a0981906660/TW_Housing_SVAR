@@ -1,22 +1,13 @@
-library(plyr)
-library(tidyverse)
-library(ggplot2)
-require("matrixcalc")
-# library(vars)
-# library(svars)
-# library(readxl)
-# library(tsibble)
-# library(x12)          # for x12 seasonal adjustment
-# library(seasonal)     # for x13 seasonal adjustment
-# library(ggfortify)
-# library(ggthemes)
-# library(boot)
-# library(expm)         # allow using "%^%" to calculate the power of a matrix 
-# library(timetk)
-# library(gridExtra)
-library(ggplot2)
-library(Rmisc)
-library(lattice)
+# library(plyr)
+# # library(tidyverse)
+# library(dplyr)
+# library(tidyr)
+# library(readr)
+# library(ggplot2)
+# require(matrixcalc)
+# # library(Rmisc)
+# library(lattice)
+# library(cowplot)
 
 Shift.Right = function(Data, n.shift = 1){
   n.row  = nrow(as.matrix(Data))
@@ -590,33 +581,3 @@ vec = function (x){     # 參考 matrixcalc
   }
   return(t(t(as.vector(x))))
 }
-
-
-
-### Jen-Ckuan
-# svar.ab <- function(estimation, try, max.iter=3000, conv.crit = 1e-6, Amat, Bmat){
-#   seeds <- c()
-#   for (i in c(1:try)) {
-#     set.seed(i)
-#     svar_try <- try(SVAR(estimation, estmethod = "scoring",max.iter = max.iter, 
-#                          conv.crit = 1e-6, Amat = Amat, Bmat = Bmat,
-#                          lrtest = FALSE,
-#                          start = c(rnorm(sum(is.na(Amat), is.na(Bmat))))), silent = T)
-#     if (is(svar_try, "try-error") == FALSE){
-#       seeds <- append(seeds, i)
-#       #print(paste0("Seeds avaiable:", i))
-#     }
-#     if (i==try){print("Done!")}
-#   }
-#   if (length(seeds) != 0){
-#     x <- seeds[[1]]
-#     print(paste0("Use seed ", x ," as an example"))
-#     set.seed(x)
-#     svar_est <- SVAR(estimation, estmethod = "scoring",max.iter = max.iter, 
-#                      conv.crit = 1e-6, Amat = Amat, Bmat = Bmat,
-#                      lrtest = FALSE,
-#                      start = c(rnorm(sum(is.na(A), is.na(B)))))
-#   }
-#   result <- list("seed" = seeds, "svar_est" = svar_est)
-#   return(result)
-# }
