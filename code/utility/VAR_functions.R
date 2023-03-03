@@ -1,13 +1,4 @@
-# library(plyr)
-# # library(tidyverse)
-# library(dplyr)
-# library(tidyr)
-# library(readr)
-# library(ggplot2)
-# require(matrixcalc)
-# # library(Rmisc)
-# library(lattice)
-# library(cowplot)
+#' @description The following codes are modified from Huang and Kuan's Book
 
 Shift.Right = function(Data, n.shift = 1){
   n.row  = nrow(as.matrix(Data))
