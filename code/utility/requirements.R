@@ -9,7 +9,9 @@ pkgLoad <- function( packages = "requirements" ) {
                    "matrixcalc",
                    # "Rmisc",
                    "lattice",
-                   "cowplot"
+                   "cowplot",
+                   "lubridate",
+                   "xtable"
                    )
   }
   

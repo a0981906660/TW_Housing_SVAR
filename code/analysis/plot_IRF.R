@@ -1,7 +1,7 @@
 rm(list = ls())
 
 # Load IRF data
-df_IRF_plot <- readRDS("./data/cleaned_data/df_IRF_plot.RDS")
+df_IRF_plot <- readRDS("./data/intermediate_result/df_IRF_plot.RDS")
 
 # make plots
 

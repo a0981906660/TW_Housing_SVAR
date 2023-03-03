@@ -10,7 +10,10 @@ require(matrixcalc)
 # library(Rmisc)
 library(lattice)
 library(cowplot)
+library(xtable)
+library(Rmisc)
 
+source("./code/utility/preamble.R")
 
 #' @section Self-defined functions
 
