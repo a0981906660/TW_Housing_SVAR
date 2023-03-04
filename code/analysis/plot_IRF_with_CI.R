@@ -110,12 +110,3 @@ df_IRF_plot.BS.Median_negative <- (df_IRF_plot.BS.Median*shock_sign) %>% as_tibb
 df_IRF_plot.BS.Mean_negative <- (df_IRF_plot.BS.Mean*shock_sign) %>% as_tibble()
 df_IRF_plot_negative <- (df_IRF_plot*shock_sign) %>% as_tibble()
 
-
-
-
-
-
-
-
-
-

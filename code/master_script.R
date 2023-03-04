@@ -27,6 +27,10 @@ source("./code/analysis/plot_IRF_with_CI.R")
 source("./code/analysis/plot_IRF_with_CI_shock_sign.R")
 
 # plot IRF
+shock_sign <- 1
+source("./code/analysis/plot_IRF_with_CI_shock_sign.R")
+shock_sign <- -1
+source("./code/analysis/plot_IRF_with_CI_shock_sign.R")
 
 # estimate Variance Decomposition
 
