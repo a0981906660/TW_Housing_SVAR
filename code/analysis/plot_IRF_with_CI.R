@@ -1,6 +1,6 @@
 
-
-df_IRF.sim <- read_rds("./data/intermediate_result/df_IRF.sim_m1_hrz20.rds")
+# Load data
+df_IRF.sim <- read_rds("./data/intermediate_result/df_IRF.sim_hrz20.rds")
 
 # 看某一頁
 head(df_IRF.sim[,,1000])

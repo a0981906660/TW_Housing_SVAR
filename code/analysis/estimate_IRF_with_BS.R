@@ -1,10 +1,13 @@
-# Load data
+#' @title Estimate IRF with Bootstrap Confidence Interval
+# Load minimal data
+rm(list = setdiff(ls(), c("By", "VAR.P", "CONST", "Y", "X", "hrz", "shock_sign", "num_var", "inv_tol")))
 
+source("./code/utility/utils.R")
+source("./code/utility/var_functions.R")
 
 
 lower = 0.025                                        # 控制成 95% CI
 upper = 1-lower
-kk = ncol(By)
 ddY = VAR.ddY(By, VAR.P)
 ddX = VAR.ddX(By, VAR.P)
 
@@ -12,7 +15,7 @@ ddX = VAR.ddX(By, VAR.P)
 
 T   = nrow(ddY)
 T.total= nrow(By)
-Ik  = diag(rep(1, kk))
+Ik  = diag(rep(1, num_var))
 # 16 coef if 4 variables; 55 coef if 5 variables
 Coef = t(VAR.EbyE(ddY, ddX, CONST)$ddA)              # Step 1 估計模型
 # residuals
@@ -22,12 +25,12 @@ if(CONST == TRUE){
   const = Coef[, ncol(Coef)]
   Coef.noc= Coef[,-ncol(Coef)]                      # 刪掉 const
 }else{
-  const = matrix(0, kk, 1)
+  const = matrix(0, num_var, 1)
   Coef.noc = Coef
 }
 
-Theta.unit= VAR.Theta(Coef, h, BSigma.u, CONST)$unit # 估算 Theta.unit
-Theta.std = VAR.Theta(Coef, h, BSigma.u, CONST)$std  # 估算 Theta.std
+Theta.unit= VAR.Theta(Coef, hrz + 1, BSigma.u, CONST)$unit # 估算 Theta.unit
+Theta.std = VAR.Theta(Coef, hrz + 1, BSigma.u, CONST)$std  # 估算 Theta.std
 
 # dm.U <- U-mean(U)
 dm.U <- U
@@ -42,12 +45,12 @@ dim(ddX); dim(Coef.noc); dim(dm.U)
 
 
 # 存N次重抽的IRF
-df_IRF.sim <- array(NA, c(hrz+1,kk^2,N)) #dimensions are: Time Period, Number of shock interacts with variables, page (number of Bootstrap resamplings)
+df_IRF.sim <- array(NA, c(hrz+1, num_var^2, N)) #dimensions are: Time Period, Number of shock interacts with variables, page (number of Bootstrap resamplings)
 counter <- 1
 while(TRUE){
   
   #cat("Now, there are ", counter-1, " sets of resamples.\n")
-  Y.sim = matrix(0, nrow = T.total, ncol = kk)          # Y.sim = 0 #pseudo time series
+  Y.sim = matrix(0, nrow = T.total, ncol = num_var)          # Y.sim = 0 #pseudo time series
   Y.sim[c(1:VAR.P),] = By[c(1:VAR.P), ] #initial values
   
   boot.number = sample(c(1:T), replace = TRUE)      # Step 3 取出放回
@@ -56,12 +59,12 @@ while(TRUE){
   # predicted values given the above initial values
   last.y= c(t(By[VAR.P:1,]))
   for(ii in 1:T){
-    last.y = last.y[1:(kk*VAR.P)]
+    last.y = last.y[1:(num_var*VAR.P)]
     Y.sim[ii+VAR.P, ] = Coef.noc %*% last.y + const + U.sim[ii,]      # Step 4 模擬資料
     last.y = c(Y.sim[ii+VAR.P,], last.y)
   }
   
-  #   Y.sim[-c(1:VAR.P),] <- matrix(const, nrow = T.total-VAR.P, ncol = kk, byrow = T) + ddX %*% t(Coef.noc) + U.sim
+  #   Y.sim[-c(1:VAR.P),] <- matrix(const, nrow = T.total-VAR.P, ncol = num_var, byrow = T) + ddX %*% t(Coef.noc) + U.sim
   
   
   #`Y.sim` is the pseudo time series
@@ -81,7 +84,7 @@ while(TRUE){
   SVAR_AB_IRF.sim <- VAR.svarirf.AB(Y.sim, VAR.P, Amat, Bmat, h = hrz, CONST, SVAR_AB_est = SVAR_AB_est.sim)
   
   # 5*5個圖的time series
-  df_IRF_plot.sim <- matrix(NA, hrz+1, kk^2) #%>% as.tibble()
+  df_IRF_plot.sim <- matrix(NA, hrz+1, num_var^2) #%>% as.tibble()
   # df_IRF.sim <- array(1:(120*25*N), c(120,25,N))
   # df_IRF.sim[2,1,1] # slicing
   
@@ -89,8 +92,8 @@ while(TRUE){
   for(period in SVAR_AB_IRF.sim){
     k <- 0 # k表示把5*5的矩陣攤平到25個col的df時，要攤到第幾個columns上
     h <- h+1 # h表示第幾期的IRF
-    for(j in 1:kk){
-      for(i in 1:kk){
+    for(j in 1:num_var){
+      for(i in 1:num_var){
         k <- k+1 # k表示把5*5的矩陣攤平到25個col的df時，要攤到第幾個columns上
         df_IRF_plot.sim[h,k] <- period[i,j]
       }
@@ -107,4 +110,4 @@ while(TRUE){
 
 
 # Save
-saveRDS(df_IRF.sim, file = "./data/intermediate_result/df_IRF.sim_m1_hrz20.rds")
+saveRDS(df_IRF.sim, file = "./data/intermediate_result/df_IRF.sim_hrz20.rds")

@@ -1,3 +1,5 @@
+# Load data
+df_IRF.sim <- read_rds("./data/intermediate_result/df_IRF.sim_hrz20.rds")
 
 print(shock_sign)
 
