@@ -60,57 +60,90 @@ head(By-SVAR_AB_Hist.c0, 10)
 # 只有特定衝擊下的時間序列與基本預測時間序列之偏離值
 
 ## shock1: monetary policy shock
-head(SVAR_AB_HistDecomp[,c(1,6,11,16,21)], 10)
-
-
-##左：baseline上 hp 的變化；右：shock1 對 hp 的衝擊
+tail(SVAR_AB_HistDecomp[,c(1,6,11,16,21)], 10)
+## 左：baseline上 hp 的變化；
+## 右：shock1 對 R, sent, permit, loan, hp 的effects. And pick up the last one
 tail(cbind((By-SVAR_AB_Hist.c0)[,5], 
            (SVAR_AB_HistDecomp[,c(1,6,11,16,21)])[,5]))
 
-# 對「房價」的歷史分解：monetary policy shock對房價的解釋力
-df_HD_plot <- bind_cols((By-SVAR_AB_Hist.c0)[,5],
-                        (SVAR_AB_HistDecomp[,c(1,6,11,16,21)])[,5])
-colnames(df_HD_plot) <- c("BaseLine", "Shock1")
-ggplot(df_HD_plot)+
-  geom_line(aes(x = 1:nrow(df_HD_plot), y = Shock1), col = 'red', linetype = "dashed")+
-  geom_line(aes(x = 1:nrow(df_HD_plot), y = BaseLine), col = 'royalblue')
 
-# 對「房價」的歷史分解：expectation shock對房價的解釋力
-df_HD_plot <- bind_cols((By-SVAR_AB_Hist.c0)[,5],
-                        (SVAR_AB_HistDecomp[,c(2,7,12,17,22)])[,5])
-colnames(df_HD_plot) <- c("BaseLine", "Shock2")
-ggplot(df_HD_plot)+
-  geom_line(aes(x = 1:nrow(df_HD_plot), y = Shock2), col = 'red', linetype = "dashed")+
-  geom_line(aes(x = 1:nrow(df_HD_plot), y = BaseLine), col = 'royalblue')
-
-# 對「房價」的歷史分解：supply shock對房價的解釋力
-df_HD_plot <- bind_cols((By-SVAR_AB_Hist.c0)[,5],
-                        (SVAR_AB_HistDecomp[,c(3,8,13,18,23)])[,5])
-colnames(df_HD_plot) <- c("BaseLine", "Shock3")
-ggplot(df_HD_plot)+
-  geom_line(aes(x = 1:nrow(df_HD_plot), y = Shock3), col = 'red', linetype = "dashed")+
-  geom_line(aes(x = 1:nrow(df_HD_plot), y = BaseLine), col = 'royalblue')
+# helper functions
+# i: select the variable of interest (e.g. [mp, exp, hs, hd, hp])
+# j: select the shock of interest
+# e.g. we want to know how mp shock affects hp
+make_HD_plot_dataframe <- function(i,   # variable of interest
+                                   j    # shock of interest
+                                   ) {
+  SVAR_HD_plot_temp <- bind_cols(
+    BaseLine = (By-SVAR_AB_Hist.c0)[, i], # represent the bias, i.e. turn on all shocks
+    Shock = SVAR_AB_HistDecomp[, num_var*(i - 1) + j ] # turn on only one shock
+    ) 
+  return(SVAR_HD_plot_temp)
+}
 
 
-# 對「房價」的歷史分解：housing demand shock對房價的解釋力
-df_HD_plot <- bind_cols((By-SVAR_AB_Hist.c0)[,5],
-                        (SVAR_AB_HistDecomp[,c(4,9,14,19,24)])[,5])
-colnames(df_HD_plot) <- c("BaseLine", "Shock4")
-ggplot(df_HD_plot)+
-  geom_line(aes(x = 1:nrow(df_HD_plot), y = Shock4), col = 'red', linetype = "dashed")+
-  geom_line(aes(x = 1:nrow(df_HD_plot), y = BaseLine), col = 'royalblue')
+# Make plots
+# HD for house price -> i = 5
+df_HD_plot_list <- list() # store the df for plot
+HD_plot_list <- list()    # store the plot itself
+for ( j in 1:5) {
+  df.temp <- make_HD_plot_dataframe(5, j)
+  # prepare df
+  df_HD_plot_list <- append(df_HD_plot_list,
+                            list(df.temp)
+                            )
+  # make plot
+  plot.temp <- ggplot(df.temp, aes(x = 1:nrow(df.temp))) + 
+    geom_line(aes(y = Shock), col = "red", linetype = "dashed") +
+    geom_line(aes(y = BaseLine), col = "royalblue") + 
+    labs(x = "")
+  HD_plot_list <- append(HD_plot_list, list(plot.temp))
+}
 
 
-# 對「房價」的歷史分解：Residual shock對房價的解釋力
-df_HD_plot <- bind_cols((By-SVAR_AB_Hist.c0)[,5],
-                        (SVAR_AB_HistDecomp[,c(5,10,15,20,25)])[,5])
-colnames(df_HD_plot) <- c("BaseLine", "Shock4")
-ggplot(df_HD_plot)+
-  geom_line(aes(x = 1:nrow(df_HD_plot), y = Shock4), col = 'red', linetype = "dashed")+
-  geom_line(aes(x = 1:nrow(df_HD_plot), y = BaseLine), col = 'royalblue')
+# # 對「房價」的歷史分解：monetary policy shock對房價的解釋力
+# df_HD_plot <- bind_cols((By-SVAR_AB_Hist.c0)[,5],
+#                         (SVAR_AB_HistDecomp[,c(1,6,11,16,21)])[,5])
+# colnames(df_HD_plot) <- c("BaseLine", "Shock1")
+# ggplot(df_HD_plot)+
+#   geom_line(aes(x = 1:nrow(df_HD_plot), y = Shock1), col = 'red', linetype = "dashed")+
+#   geom_line(aes(x = 1:nrow(df_HD_plot), y = BaseLine), col = 'royalblue')
+# 
+# # 對「房價」的歷史分解：expectation shock對房價的解釋力
+# df_HD_plot <- bind_cols((By-SVAR_AB_Hist.c0)[,5],
+#                         (SVAR_AB_HistDecomp[,c(2,7,12,17,22)])[,5])
+# colnames(df_HD_plot) <- c("BaseLine", "Shock2")
+# ggplot(df_HD_plot)+
+#   geom_line(aes(x = 1:nrow(df_HD_plot), y = Shock2), col = 'red', linetype = "dashed")+
+#   geom_line(aes(x = 1:nrow(df_HD_plot), y = BaseLine), col = 'royalblue')
+# 
+# # 對「房價」的歷史分解：supply shock對房價的解釋力
+# df_HD_plot <- bind_cols((By-SVAR_AB_Hist.c0)[,5],
+#                         (SVAR_AB_HistDecomp[,c(3,8,13,18,23)])[,5])
+# colnames(df_HD_plot) <- c("BaseLine", "Shock3")
+# ggplot(df_HD_plot)+
+#   geom_line(aes(x = 1:nrow(df_HD_plot), y = Shock3), col = 'red', linetype = "dashed")+
+#   geom_line(aes(x = 1:nrow(df_HD_plot), y = BaseLine), col = 'royalblue')
+# 
+# # 對「房價」的歷史分解：housing demand shock對房價的解釋力
+# df_HD_plot <- bind_cols((By-SVAR_AB_Hist.c0)[,5],
+#                         (SVAR_AB_HistDecomp[,c(4,9,14,19,24)])[,5])
+# colnames(df_HD_plot) <- c("BaseLine", "Shock4")
+# ggplot(df_HD_plot)+
+#   geom_line(aes(x = 1:nrow(df_HD_plot), y = Shock4), col = 'red', linetype = "dashed")+
+#   geom_line(aes(x = 1:nrow(df_HD_plot), y = BaseLine), col = 'royalblue')
+# 
+# # 對「房價」的歷史分解：Residual shock對房價的解釋力
+# df_HD_plot <- bind_cols((By-SVAR_AB_Hist.c0)[,5],
+#                         (SVAR_AB_HistDecomp[,c(5,10,15,20,25)])[,5])
+# colnames(df_HD_plot) <- c("BaseLine", "Shock4")
+# ggplot(df_HD_plot)+
+#   geom_line(aes(x = 1:nrow(df_HD_plot), y = Shock4), col = 'red', linetype = "dashed")+
+#   geom_line(aes(x = 1:nrow(df_HD_plot), y = BaseLine), col = 'royalblue')
 
 
 # making table
+# prepare time labels
 t_label <- c()
 year_label <- c()
 season_label <- c()
@@ -128,44 +161,53 @@ for(q in 1:115){
   }
 }
 
-df_HD <- bind_cols(t_label,
-                   year_label,
-                   season_label,
-                   (By-SVAR_AB_Hist.c0)[,5],
-                   SVAR_AB_HistDecomp[,21],
-                   SVAR_AB_HistDecomp[,22],
-                   SVAR_AB_HistDecomp[,23],
-                   SVAR_AB_HistDecomp[,24],
-                   SVAR_AB_HistDecomp[,25])
-colnames(df_HD) <- c("Time", "Year", "Season", "BaseLine", "mp", "exp", "hs", "hd", "sp")
-tail(df_HD)
 
+
+# i: variable of interest
+# j: shock of interest
+i <- 5 
+df_HD <- bind_cols(
+  Time = t_label,
+  Year = year_label,
+  Season = season_label,
+  BaseLine = (By-SVAR_AB_Hist.c0)[,i]
+)
+
+shock_labels <- c("mp", "exp", "hs", "hd", "hp")
+for (j in 1:5) {
+  df_HD <- bind_cols(
+    df_HD,
+    !!sym(shock_labels[j]) := SVAR_AB_HistDecomp[, num_var*(i-1) + j]
+  ) 
+}
 
 df_HD.table <- df_HD %>% 
-  summarise(Time = Time,
-            Year = Year,
-            Season = Season,
-            mp = mp/BaseLine*100,
-            exp = exp/BaseLine*100,
-            hs = hs/BaseLine*100,
-            hd = hd/BaseLine*100,
-            sp = sp/BaseLine*100) %>%
+  # find "contribution" amount of each shock and normalized to percentage
+  mutate(mp = mp/BaseLine*100,
+         exp = exp/BaseLine*100,
+         hs = hs/BaseLine*100,
+         hd = hd/BaseLine*100,
+         hp = hp/BaseLine*100) %>%
+  select(-BaseLine) %>%
   drop_na()
 
 
-
+# helper function
 get_HD.table <- function(df_HD.table, 
                          year_start, season_start,
                          year_end, season_end){
   HD_seq.temp <- df_HD.table %>%
+    # filter by year
     filter( Year >= year_start & Year <= year_end) %>%
+    # if in the same year, weed out quarters prior to the assigned quarter
     filter( !(Year==year_start & Season < season_start) ) %>%
+    # same logic as above
     filter( !(Year==year_end & Season > season_end) ) %>%
     summarise(mp = median(mp),
               exp = median(exp),
               hs = median(hs),
               hd = median(hd),
-              sp = median(sp))
+              hp = median(hp))
   return(HD_seq.temp)
 }
 
@@ -207,17 +249,17 @@ colnames(HD.table) <- c("樣本期間",
                         "Demand Shock",
                         "Supply Shock",
                         "Residual Shock")
-HD.table
 
+# export table
+tab_HD <- xtable(HD.table, 
+                 caption= "歷史分解下各衝擊的解釋力比率(%)", 
+                 align=c("c","c","c","c","c","c", "c"))
 
-# 生出table
-tab_HD <- xtable(HD.table, caption= "歷史分解下各衝擊的解釋力比率(%)", align=c("c","c","c","c","c","c", "c"))
-print(tab_HD, include.rownames=FALSE)
-
-print(tab_HD, include.rownames=FALSE,
-      file="result/table/HD_0219_m1.tex",
+print(tab_HD, include.rownames = FALSE,
+      file = "result/table/tab_HD_subsamples.tex",
       append=T, table.placement = "h",
-      caption.placement="bottom", hline.after=seq(from=-1,to=nrow(tab_HD),by=1))
+      caption.placement = "bottom", 
+      hline.after = seq(from = -1,to = nrow(tab_HD), by = 1))
 
 
 # Save Plots
