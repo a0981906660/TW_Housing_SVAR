@@ -44,13 +44,15 @@ create_multiple_time_series <- function(data,         # a tibble
 
 #' @description make multiple plots
 make_multiple_plots <- function(figure_list,
-                                ncol = 2) {
+                                ncol = 2,
+                                nrow = 3) {
   res <- cowplot::plot_grid(plotlist = figure_list, 
                             align = "vh",
                             axis = "l",
                             # rel_heights = c(1, 1),
                             byrow = T,
-                            nrow = 3)
+                            ncol = ncol,
+                            nrow = nrow)
   return(res)
 }
 
@@ -68,3 +70,30 @@ ggsave_default <- function(figure, path) {
          width = 30, height = 20, units = "cm",
          device = "pdf") 
 }
+
+
+#' @description Create multiplot for IRF
+create_multiple_IRF_plot <- function(data,          # a tibble
+                                     horizon,       # string; a column in `data` representing timestamps
+                                     columns = ..., # vector of string; time series data to plot
+                                     xlab = "",     # label for x-axis
+                                     ylab = ""      # label for y-axis
+                                     ) {
+  # a container to store tmep figures
+  fig_lst <- list()
+  for (column in columns) {
+    fig_temp <- ggplot(data, aes(x = (1:horizon), y = !!sym(column)))+
+      geom_line()+
+      labs(x = xlab)
+    fig_lst <- append(fig_lst, list(fig_temp))
+  }
+  return(fig_lst)
+}
+
+# # simple unit test
+# temp <- create_multiple_IRF_plot(df_IRF_plot, 20, c("V1", "V2"))
+# temp[[1]]
+# temp[[2]]
+
+
+

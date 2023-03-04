@@ -55,7 +55,7 @@ VAR.P = 7                       # 最大的落後項數
 CONST = TRUE                    # 是否有常數項
 Y     = VAR.Y(By, VAR.P)        # 設定 Y
 X     = VAR.X(By, VAR.P)        # 設定 X
-hrz=19 # the length of response
+hrz = 19 # the length of response
 shock_sign = -1 # control the positive/negative shock
 num_var <- dim(By)[2]
 

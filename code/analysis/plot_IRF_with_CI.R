@@ -1,3 +1,6 @@
+# Load graph setting
+source("./code/utility/preamble.R")
+source("./code/utility/utils.R")
 
 # Load data
 df_IRF.sim <- read_rds("./data/intermediate_result/df_IRF.sim_hrz20.rds")
