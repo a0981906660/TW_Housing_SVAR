@@ -74,7 +74,7 @@ ggsave_default <- function(figure, path) {
 
 #' @description Create multiplot for IRF
 create_multiple_IRF_plot <- function(data,          # a tibble
-                                     horizon,       # string; a column in `data` representing timestamps
+                                     horizon,       # numeric
                                      columns = ..., # vector of string; time series data to plot
                                      xlab = "",     # label for x-axis
                                      ylab = ""      # label for y-axis
@@ -84,16 +84,17 @@ create_multiple_IRF_plot <- function(data,          # a tibble
   for (column in columns) {
     fig_temp <- ggplot(data, aes(x = (1:horizon), y = !!sym(column)))+
       geom_line()+
-      labs(x = xlab)
+      labs(x = xlab, y = ylab)+
+      Text_Size_Theme
     fig_lst <- append(fig_lst, list(fig_temp))
   }
   return(fig_lst)
 }
 
 # # simple unit test
-# temp <- create_multiple_IRF_plot(df_IRF_plot, 20, c("V1", "V2"))
-# temp[[1]]
-# temp[[2]]
+# fig_list <- create_multiple_IRF_plot(df_IRF_plot, 20, c("V1", "V2"))
+# fig_list[[1]]
+# fig_list[[2]]
 
 
 
