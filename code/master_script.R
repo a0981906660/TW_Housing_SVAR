@@ -22,21 +22,18 @@ source("./code/analysis/svar.R")
 source("./code/analysis/estimate_IRF.R")
 source("./code/analysis/estimate_IRF_with_BS.R")
 
-source("./code/analysis/plot_IRF.R")
-source("./code/analysis/plot_IRF_with_CI.R")
-source("./code/analysis/plot_IRF_with_CI_shock_sign.R")
-
 # plot IRF
+source("./code/analysis/plot_IRF.R")
 shock_sign <- 1
 source("./code/analysis/plot_IRF_with_CI_shock_sign.R")
 shock_sign <- -1
 source("./code/analysis/plot_IRF_with_CI_shock_sign.R")
 
-# estimate Variance Decomposition
-
-# tabulate VD
+# estimate Variance Decomposition and export table
+source("./code/analysis/estimate_VD.R")
 
 # estimate Historical Decomposition
+source("./code/analysis/estimate_HD.R")
 
 # plot HD
 

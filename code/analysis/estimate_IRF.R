@@ -2,7 +2,7 @@
 
 source("./code/analysis/svar.R")
 
-SVAR_AB_IRF <- VAR.svarirf.AB(By, VAR.P, Amat, Bmat, h = hrz, CONST, SVAR_AB_est = SVAR_AB_est)
+# SVAR_AB_IRF <- VAR.svarirf.AB(By, VAR.P, Amat, Bmat, h = hrz, CONST, SVAR_AB_est = SVAR_AB_est)
 
 # 5*5個圖的time series
 df_IRF_plot <- matrix(NA, hrz+1, num_var^2) 

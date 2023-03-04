@@ -110,7 +110,7 @@ SVAR_AB_est <- list("A0.svar" = A0, "B0.svar" = B0)
 
 #' #' @section Impulse Response Function (IRF) -- with C.I. (interval estimators)
 #' source("./code/analysis/estimate_IRF_with_BS.R")
-
+SVAR_AB_IRF <- VAR.svarirf.AB(By, VAR.P, Amat, Bmat, h = hrz, CONST, SVAR_AB_est = SVAR_AB_est)
 
 #' @section Historical Decomposition
 # source("./code/analysis/estimate_HD.R")

@@ -1,4 +1,7 @@
 #' @section Historical Decomposition
+
+source("./code/analysis/svar.R")
+
 if(hrz<nrow(By)){
   SVAR_AB_IRF <- VAR.svarirf.AB(By, VAR.P, Amat, Bmat, h = nrow(By), CONST, SVAR_AB_est = SVAR_AB_est)
 }
