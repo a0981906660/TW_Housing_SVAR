@@ -99,3 +99,23 @@ ggsave_default(fig_shock2, "./result/figure/fig_IRF_shock2.pdf")
 ggsave_default(fig_shock3, "./result/figure/fig_IRF_shock3.pdf")
 ggsave_default(fig_shock4, "./result/figure/fig_IRF_shock4.pdf")
 ggsave_default(fig_shock5, "./result/figure/fig_IRF_shock5.pdf")
+
+
+# With shock sign
+cat(">>> shock sign is: ", shock_sign, "\n")
+
+df_IRF_plot.BS.L_negative <- (df_IRF_plot.BS.L*shock_sign) %>% as_tibble()
+df_IRF_plot.BS.U_negative <- (df_IRF_plot.BS.U*shock_sign) %>% as_tibble()
+df_IRF_plot.BS.Median_negative <- (df_IRF_plot.BS.Median*shock_sign) %>% as_tibble()
+df_IRF_plot.BS.Mean_negative <- (df_IRF_plot.BS.Mean*shock_sign) %>% as_tibble()
+df_IRF_plot_negative <- (df_IRF_plot*shock_sign) %>% as_tibble()
+
+
+
+
+
+
+
+
+
+
