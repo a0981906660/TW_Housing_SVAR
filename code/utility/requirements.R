@@ -11,7 +11,8 @@ pkgLoad <- function( packages = "requirements" ) {
                    "lattice",
                    "cowplot",
                    "lubridate",
-                   "xtable"
+                   "xtable",
+                   "assertthat"
                    )
   }
   

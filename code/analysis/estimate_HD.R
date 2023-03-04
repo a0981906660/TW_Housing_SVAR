@@ -1,25 +1,64 @@
 #' @section Historical Decomposition
 
+rm(list = ls())
+
 source("./code/analysis/svar.R")
 
-if(hrz<nrow(By)){
-  SVAR_AB_IRF <- VAR.svarirf.AB(By, VAR.P, Amat, Bmat, h = nrow(By), CONST, SVAR_AB_est = SVAR_AB_est)
+# ddTheta's length determines the horizon of HD can be
+# so if we want to trace back longer (have a greater length of HD horizon)
+# we need to re-estimate ddTheta with full length
+if(hrz < nrow(By)){
+  SVAR_AB_IRF <- VAR.svarirf.AB(By, VAR.P, Amat, Bmat,    # pre-estimated A, B matrices
+                                h = nrow(By),             # a longer horizon
+                                CONST, 
+                                SVAR_AB_est = SVAR_AB_est # estimated A, B matrices
+                                )
 }
 
+# estimate historical decomposition
+# it is a matrix that stores each shock in the past
+# note that the dimension is (available horizon, num_var^2)
+
 SVAR_AB_HistDecomp <- VAR.svarhist.AB(By, VAR.P, Amat, Bmat, CONST)
-dim(SVAR_AB_HistDecomp)
+# check dimenson
+# the column of the matrix should be num_var^2
+# use assertthat
+data_new %>% drop_na() %>% nrow() == dim(SVAR_AB_HistDecomp)[1]
+num_var^2 == dim(SVAR_AB_HistDecomp)[2]
+
+#' @example Explanation of the num_var^2 columns
+#' We have 5-variable model which is [mp, exp, hs, hd, hp]'
+# V1 is the historical mp shocks that affected the interest rate time series
+# V5 is the historical mp shocks that affected the house price time series
+# V21 is the historical hp shocks that affected the interest rate time series
+# V25 is the historical hp shocks that affected the house price time series
 
 #----- Base Project 估計 -----#
-SVAR_AB_Hist.c0 = VAR.baseproject(By, VAR.P, CONST)
-head(SVAR_AB_Hist.c0)
-dim(SVAR_AB_Hist.c0)
-dim(By)
+# Base projection is a counterfactural time series without any shock
+SVAR_AB_Hist.c0 <- VAR.baseproject(By, VAR.P, CONST)
+dim(SVAR_AB_Hist.c0) == dim(By)
+
+#' @details 
+#' The actual time series (what we observed): By
+#' The counterfactual time series without any shocks (base projection): c0
+#' The historical shocks: SVAR_AB_HistDecomp
+#' The following should hold:
+#' By = c0 + (aggregated historical shocks)
 
 # 實際時間序列與基本預測時間序列之偏離值
+# This amount of bias is contributed by all the shocks
+# e.g. The historical hp time series is deviated from the base projected hp series
+#      since there are 5 shocks contributed
+#      so we could see how each shock contributes the most by compare the bias and the each shock
 head(By-SVAR_AB_Hist.c0, 10)
-# 前幾個（VAR.P個，即lag幾期）會是0
+# It is worth noting that since we chose the lag VAR.P (here is 7), 
+# thus the base projection of 1:VAR.P would be exactly the same as the actual time series
+# i.e. the bias of 1:VAR.P is 0
 
+
+#' @section Bias when only turning on specific shocks
 # 只有特定衝擊下的時間序列與基本預測時間序列之偏離值
+
 ## shock1: monetary policy shock
 head(SVAR_AB_HistDecomp[,c(1,6,11,16,21)], 10)
 

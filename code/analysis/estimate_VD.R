@@ -2,19 +2,14 @@
 
 rm(list = ls())
 
+# Prepare necessary matrices: By, Amat, Bmat and SVAR_AB_IRF
 source("./code/analysis/svar.R")
 
-# SVAR_AB_IRF <- VAR.svarirf.AB(By, VAR.P, Amat, Bmat, h = hrz, CONST, SVAR_AB_est = SVAR_AB_est)
-
-
-# `ddTheta` 放已經估出來的IRF (至於要放怎樣穩定的還要再想)
+# `ddTheta` 放已經估出來的IRF 
 # m表示對於第幾個變數的變異數分解（如第五個是對房價的變異數分解）
 SVAR_AB_VarDecomp <- VAR.svardecomp.AB(m = 5, By, VAR.P,
                                        AMat, BMat, h=(hrz+1),
                                        Const=TRUE, ddTheta = SVAR_AB_IRF)
-# head(SVAR_AB_VarDecomp*100)
-# tail(SVAR_AB_VarDecomp*100)
-(SVAR_AB_VarDecomp*100)
 
 # export the raw table
 VD_TABLE <- (SVAR_AB_VarDecomp*100) %>% 

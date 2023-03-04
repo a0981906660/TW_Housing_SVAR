@@ -88,7 +88,7 @@ for (i in 2:num_var) {
 # Amat[4,1]  = NA; Amat[4,2]  = NA; Amat[4,3]  = NA;
 # Amat[5,1]  = NA; Amat[5,2]  = NA; Amat[5,3]  = NA; Amat[5,4]  = NA;
 
-Bmat = diag(5)
+Bmat = diag(num_var)
 diag(Bmat) = NA
 
 
@@ -97,21 +97,13 @@ C.Prime <- chol(Sigma.OLS)
 C <- t(C.Prime)
 
 # solving system of linear equation
-B0 <- diag(diag(C), ncol = 5, nrow = 5)
+B0 <- diag(diag(C), ncol = num_var, nrow = num_var)
 A0 <- B0 %*% solve(C)
 
+# A, B matrices
 SVAR_AB_est <- list("A0.svar" = A0, "B0.svar" = B0)
 
 
-
-
-
-
-
-#' #' @section Impulse Response Function (IRF) -- with C.I. (interval estimators)
-#' source("./code/analysis/estimate_IRF_with_BS.R")
+# Point estimation of IRF, denoted as ddTheta
+# it is necessary to have ddTheta to have further estimations
 SVAR_AB_IRF <- VAR.svarirf.AB(By, VAR.P, Amat, Bmat, h = hrz, CONST, SVAR_AB_est = SVAR_AB_est)
-
-#' @section Historical Decomposition
-# source("./code/analysis/estimate_HD.R")
-
