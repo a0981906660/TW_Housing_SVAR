@@ -52,10 +52,10 @@ make_multiple_plots <- function(figure_list,
 #        device = "pdf")
 
 #' @description Save plots with default settings
-ggsave_default <- function(figure, path) {
+ggsave_default <- function(figure, path, width = 30, height = 20) {
   ggsave(filename = path,
          plot = figure,
-         width = 30, height = 20, units = "cm",
+         width = width, height = height, units = "cm",
          device = "pdf") 
 }
 
@@ -119,4 +119,26 @@ get_HD.table <- function(df_HD.table,
               hd = median(hd),
               hp = median(hp))
   return(HD_seq.temp)
+}
+
+#' @description create HD plots based on HD table
+make_HD_plot <- function(data,                # the dataframe of HD
+                         shock,               # string; the shock of interest
+                         legend_shock,        # string; the shock displayed 
+                         legend_baseline,     # string; the bias displayed
+                         title_text           # string
+                         ) {
+  fig <- data %>%
+    ggplot()+
+    geom_line(aes(x = Time, y = !!sym(shock), color = legend_shock), linetype = "dashed")+
+    geom_line(aes(x = Time, y = BaseLine, color = legend_baseline))+
+    labs(x = '',
+         y = '',
+         title = title_text)+
+    Text_Size_Theme+
+    scale_color_manual(values=c('royalblue','red'))+
+    theme(legend.position="bottom", 
+          legend.direction="vertical",
+          legend.title = element_blank())
+  return(fig)
 }

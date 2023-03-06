@@ -2,167 +2,54 @@
 rm(list = ls())
 
 source("./code/utility/preamble.R")
+source("./code/utility/utils.R")
 
 df_HD <- readRDS("./data/intermediate_result/df_HD.RDS") %>% 
   mutate(Time = lubridate::yq(Time))
 
 # Make and save plots
+fig_HD_params_shocks <- c("mp", "exp", "hs", "hd", "hp")
+fig_HD_params_legend_shocks <- c("Monetary Policy Shock", 
+                                 "Housing Expectation Shock", 
+                                 "Housing Supply Shock", 
+                                 "Housing Demand Shock", 
+                                 "Residual Shock"
+                                 )
+fig_HD_params_legend_baseline <- "dLHP Deviations from Base Projection"
+fig_HD_params_title <- c("Historical Decomposition of dLhp: Monetary Policy Shock",
+                         "Historical Decomposition of dLhp: Housing Expectation Shock",
+                         "Historical Decomposition of dLhp: Housing Supply Shock",
+                         "Historical Decomposition of dLhp: Housing Demand Shock",
+                         "Historical Decomposition of dLhp: Residual Shock"
+                         )
+# apply the function to make HD plot for each shock
+fig_list <- list()
+for (i in 1:5) {
+  fig <- make_HD_plot(df_HD, 
+                      shock = fig_HD_params_shocks[i], 
+                      legend_shock = fig_HD_params_legend_shocks[i],
+                      legend_baseline = fig_HD_params_legend_baseline,
+                      title_text = fig_HD_params_title[i])
 
-make_HD_plot <- function(data,                # the dataframe of HD
-                         shock,               # string; the shock of interest
-                         legend_shock,        # string; the shock displayed 
-                         legend_baseline,     # string; the bias displayed
-                         title_text           # string
-                         ) {
-  fig <- data %>%
-    ggplot()+
-    geom_line(aes(x = Time, y = !!sym(shock), color = legend_shock), linetype = "dashed")+
-    geom_line(aes(x = Time, y = BaseLine, color = legend_baseline))+
-    labs(x = '',
-         y = '',
-         title = title_text)+
-    Text_Size_Theme+
-    scale_color_manual(values=c('royalblue','red'))+
-    theme(legend.position="bottom", 
-          legend.direction="vertical",
-          legend.title = element_blank())
-  return(fig)
+  fig_list <- append(fig_list, list(fig))
+  ggsave_default(fig, path = paste0("./result/figure/fig_HD_shock_", i, ".pdf"),
+                 width = 15, height = 10)
 }
 
-make_HD_plot(df_HD, 
-             shock = "mp", 
-             legend_shock = "Monetary Policy Shock",
-             legend_baseline = "dLHP Deviations from Base Projection",
-             title_text = "Historical Decomposition of dLhp: Monetary Policy Shock")
+# Save HD plots for all shocks once
+fig <- make_multiple_plots(fig_list, ncol = 2)
+ggsave_default(fig, "./result/figure/fig_HD_all_shocks.pdf",
+               width = 30, height = 20)
 
-# plot 1
-figure_HD.1 <- df_HD %>%
-  ggplot()+
-  geom_line(aes(x = Time, y = mp, color = "Monetary Policy Shock"), linetype = "dashed")+
-  geom_line(aes(x = Time, y = BaseLine, color = "dLHP Deviations from Base Projection"))+
-  labs(x = '',
-       y = '',
-       title = 'Historical Decomposition of dLhp: Monetary Policy Shock')+
-  Text_Size_Theme+
-  scale_color_manual(values=c('royalblue','red'))+
-  theme(legend.position="bottom", 
-        legend.direction="vertical",
-        legend.title = element_blank())
-
-# plot 2
-figure_HD.2 <- df_HD %>%
-  ggplot()+
-  geom_line(aes(x = xlab, y = exp, color = "Housing Expectation Shock"), linetype = "dashed")+
-  geom_line(aes(x = xlab, y = BaseLine, color = "dLHP Deviations from Base Projection"))+
-  labs(x = '',
-       y = '',
-       title = 'Historical Decomposition of dLhp: Housing Expectation Shock')+
-  Text_Size_Theme+
-  scale_color_manual(values=c('royalblue','red'))+
-  theme(legend.position="bottom", 
-        legend.direction="vertical",
-        legend.title = element_blank())
-
-# plot 3
-figure_HD.3 <- df_HD %>%
-  ggplot()+
-  geom_line(aes(x = xlab, y = hs, color = "Housing Supply Shock"), linetype = "dashed")+
-  geom_line(aes(x = xlab, y = BaseLine, color = "dLHP Deviations from Base Projection"))+
-  labs(x = '',
-       y = '',
-       title = 'Historical Decomposition of dLhp: Housing Supply Shock')+
-  Text_Size_Theme+
-  scale_color_manual(values=c('royalblue','red'))+
-  theme(legend.position="bottom", 
-        legend.direction="vertical",
-        legend.title = element_blank())
-
-# plot 4
-figure_HD.4 <- df_HD %>%
-  ggplot()+
-  geom_line(aes(x = xlab, y = hd, color = "Housing Demand Shock"), linetype = "dashed")+
-  geom_line(aes(x = xlab, y = BaseLine, color = "dLHP Deviations from Base Projection"))+
-  labs(x = '',
-       y = '',
-       title = 'Historical Decomposition of dLhp: Housing Demand Shock')+
-  Text_Size_Theme+
-  scale_color_manual(values=c('royalblue','red'))+
-  theme(legend.position="bottom", 
-        legend.direction="vertical",
-        legend.title = element_blank())
-
-
-
-# plot 5
-figure_HD.5 <- df_HD %>%
-  ggplot()+
-  geom_line(aes(x = xlab, y = sp, color = "Residual Shock"), linetype = "dashed")+
-  geom_line(aes(x = xlab, y = BaseLine, color = "dLHP Deviations from Base Projection"))+
-  labs(x = '',
-       y = '',
-       title = 'Historical Decomposition of dLhp: Residual Shock')+
-  Text_Size_Theme+
-  scale_color_manual(values=c('royalblue','red'))+
-  theme(legend.position="bottom", 
-        legend.direction="vertical",
-        legend.title = element_blank())
-
-
-# save shock 1
-ggsave(filename = "result/figure/0219_m1_HD_shock1.png", 
-       plot = figure_HD.1,
-       width = 15, height = 10, units = "cm",
-       device = "png")
-
-# save shock 2
-ggsave(filename = "result/figure/0219_m1_HD_shock2.png", 
-       plot = figure_HD.2,
-       width = 15, height = 10, units = "cm",
-       device = "png")
-
-# save shock 3
-ggsave(filename = "result/figure/0219_m1_HD_shock3.png", 
-       plot = figure_HD.3,
-       width = 15, height = 10, units = "cm",
-       device = "png")
-
-# save shock 4
-ggsave(filename = "result/figure/0219_m1_HD_shock4.png", 
-       plot = figure_HD.4,
-       width = 15, height = 10, units = "cm",
-       device = "png")
-# save shock 5
-ggsave(filename = "result/figure/0219_m1_HD_shock5.png", 
-       plot = figure_HD.5,
-       width = 15, height = 10, units = "cm",
-       device = "png")
-
-
-
-# For hp
-multiplot(figure_HD.1,figure_HD.2,figure_HD.3,figure_HD.4,figure_HD.5,
-          cols = 2)
-ggsave(filename = "result/figure/HD.png", 
-       plot = multiplot(figure_HD.1,
-                        figure_HD.2,
-                        figure_HD.3,
-                        figure_HD.4,
-                        figure_HD.5,
-                        cols = 2),
-       width = 15*2, height = 10*2, units = "cm",
-       device = "png")
-
-
-
-# ALL
-figure_HD.6 <- df_HD %>%
-  ggplot()+
-  geom_line(aes(x = xlab, y = BaseLine, color = "dLHP Deviations from Base Projection"))+
-  geom_line(aes(x = xlab, y = mp, color = "Monetary Policy Shock"), linetype = "dashed")+
-  geom_line(aes(x = xlab, y = exp, color = "Housing Expectation Shock"), linetype = "dashed")+
-  geom_line(aes(x = xlab, y = hs, color = "Housing Supply Shock"), linetype = "dashed")+
-  geom_line(aes(x = xlab, y = hd, color = "Housing Demand Shock"), linetype = "dashed")+
-  geom_line(aes(x = xlab, y = sp, color = "Residual Shock"), linetype = "dashed")+
+# ALL shocks displayed at the same time
+figure_HD_all_shocks <- df_HD %>%
+  ggplot(aes(x = Time))+
+  geom_line(aes(y = BaseLine, color = "dLHP Deviations from Base Projection"))+
+  geom_line(aes(y = mp, color = "Monetary Policy Shock"), linetype = "dashed")+
+  geom_line(aes(y = exp, color = "Housing Expectation Shock"), linetype = "dashed")+
+  geom_line(aes(y = hs, color = "Housing Supply Shock"), linetype = "dashed")+
+  geom_line(aes(y = hd, color = "Housing Demand Shock"), linetype = "dashed")+
+  geom_line(aes(y = hp, color = "Residual Shock"), linetype = "dashed")+
   labs(x = '',
        y = '',
        title = 'Historical Decomposition of dLhp: All Shocks')+
@@ -171,22 +58,15 @@ figure_HD.6 <- df_HD %>%
   theme(legend.position="bottom", 
         legend.direction="vertical",
         legend.title = element_blank())
-# save shock 6
-ggsave(filename = "result/figure/0219_m1_HD_shock6.png", 
-       plot = figure_HD.6,
-       width = 15, height = 10, units = "cm",
-       device = "png")
-figure_HD.6
+ggsave_default(figure_HD_all_shocks, "./result/figure/fig_HD_all_shocks_once.pdf")
 
 
-
-# ALL
-figure_HD.6 <- df_HD %>%
-  ggplot()+
-  geom_line(aes(x = xlab, y = BaseLine, color = "dLHP Deviations from Base Projection"))+
-  geom_line(aes(x = xlab, y = mp, color = "Monetary Policy Shock"), linetype = "dashed")+
-  geom_line(aes(x = xlab, y = exp, color = "Housing Expectation Shock"), linetype = "dashed")+
-  #     geom_line(aes(x = xlab, y = sp, color = "Residual Shock"), linetype = "dashed")+
+# Only turn on specific shocks: mp, exp
+figure_HD_spec_shocks <- df_HD %>%
+  ggplot(aes(x = Time))+
+  geom_line(aes(y = BaseLine, color = "dLHP Deviations from Base Projection"))+
+  geom_line(aes(y = mp, color = "Monetary Policy Shock"), linetype = "dashed")+
+  geom_line(aes(y = exp, color = "Housing Expectation Shock"), linetype = "dashed")+
   labs(x = '',
        y = '',
        title = 'Historical Decomposition of dLhp: Monetary Policy and Expectation Shocks')+
@@ -195,9 +75,4 @@ figure_HD.6 <- df_HD %>%
   theme(legend.position="bottom", 
         legend.direction="vertical",
         legend.title = element_blank())
-# save shock 6
-ggsave(filename = "result/figure/0219_m1_HD_shock6.png", 
-       plot = figure_HD.6,
-       width = 20, height = 15, units = "cm",
-       device = "png")
-figure_HD.6
+ggsave_default(figure_HD_spec_shocks, "result/figure/fig_HD_sepc_shocks.pdf")
