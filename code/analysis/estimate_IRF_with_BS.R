@@ -1,5 +1,6 @@
 #' @title Estimate IRF with Bootstrap Confidence Interval
 # Load minimal data
+source("./code/analysis/svar.R")
 rm(list = setdiff(ls(), c("By", "VAR.P", "CONST", "Y", "X", "hrz", "shock_sign", "num_var", "inv_tol")))
 
 source("./code/utility/utils.R")
@@ -12,11 +13,15 @@ ddY = VAR.ddY(By, VAR.P)
 ddX = VAR.ddX(By, VAR.P)
 
 # dim(ddY); dim(ddX)
+# the shape of ddX is available length of the data (deduct lag length) by lag*num_var
+# the shape of ddY is available length of the data (deduct lag length) by num_var
 
 T   = nrow(ddY)
 T.total= nrow(By)
 Ik  = diag(rep(1, num_var))
-# 16 coef if 4 variables; 55 coef if 5 variables
+# How many coefficients are there? 
+# For example, we have a 5-variable model, lag = 7, and include intercept is True
+# => (5 variables * 7 lags + 1 intercept)* 5 equations = (35+1)*5 = 180
 Coef = t(VAR.EbyE(ddY, ddX, CONST)$ddA)              # Step 1 估計模型
 # residuals
 U    = VAR.EbyE(ddY, ddX, CONST)$ddU
@@ -32,7 +37,6 @@ if(CONST == TRUE){
 Theta.unit= VAR.Theta(Coef, hrz + 1, BSigma.u, CONST)$unit # 估算 Theta.unit
 Theta.std = VAR.Theta(Coef, hrz + 1, BSigma.u, CONST)$std  # 估算 Theta.std
 
-# dm.U <- U-mean(U)
 dm.U <- U
 
 N = 2000 #重抽次數
@@ -40,9 +44,14 @@ Theta.unit.sim = vector("list", N)
 Theta.std.sim  = vector("list", N)
 
 # check dimension
-print("check dimensionality")
-dim(ddX); dim(Coef.noc); dim(dm.U)
-
+cat(">>> check dimensionality\n")
+assert_that(dim(ddX)[1] == dim(By)[1] - VAR.P)
+assert_that(dim(ddX)[2] == num_var * VAR.P)
+assert_that(dim(Coef.noc)[1] == num_var)
+assert_that(dim(Coef.noc)[2] == num_var*VAR.P)
+assert_that(dim(Coef.noc)[2] == num_var*VAR.P)
+assert_that(dim(dm.U)[1] == dim(By)[1] - VAR.P)
+assert_that(dim(dm.U)[2] == num_var)
 
 # 存N次重抽的IRF
 df_IRF.sim <- array(NA, c(hrz+1, num_var^2, N)) #dimensions are: Time Period, Number of shock interacts with variables, page (number of Bootstrap resamplings)

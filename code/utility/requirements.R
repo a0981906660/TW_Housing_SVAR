@@ -7,7 +7,6 @@ pkgLoad <- function( packages = "requirements" ) {
                    "readr",
                    "ggplot2",
                    "matrixcalc",
-                   # "Rmisc",
                    "lattice",
                    "cowplot",
                    "lubridate",

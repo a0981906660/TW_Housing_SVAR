@@ -3,9 +3,15 @@
 * The script serves as the code of my Master's Thesis at NTU Econ. 
 
 
+## Replication Instruction
 
-# docs
-https://sparkbyexamples.com/r-programming/add-or-append-element-to-list-in-r/
-https://bookdown.org/dereksonderegger/444/graphing-part-ii.html
-https://dereksonderegger.github.io/570L/A_Sufficient_Introduction_to_R.pdf
-https://www.rdocumentation.org/packages/cowplot/versions/1.1.1/topics/plot_grid
+This R project is created with RStudio, so it works the best to run all the script under RStudio. All path is written in relative path under the project root folder.
+
+You may also run all the scripts by the following command:
+```shell
+cd PROJECT_FOLDER
+Rscript code/master_script.R
+```
+
+Please refer to `code/mater_script.R` for step-by-step details. 
+
