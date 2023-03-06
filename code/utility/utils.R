@@ -1,17 +1,5 @@
 #' This script provides self-defined functions and imports dependencies
 
-#' Dependencies
-library(plyr)
-library(dplyr)
-library(tidyr)
-library(readr)
-library(ggplot2)
-require(matrixcalc)
-# library(Rmisc)
-library(lattice)
-library(cowplot)
-library(xtable)
-library(Rmisc)
 
 source("./code/utility/preamble.R")
 
@@ -98,3 +86,37 @@ create_multiple_IRF_plot <- function(data,          # a tibble
 
 
 
+#' @description Prepare HD df from plots 
+# i: select the variable of interest (e.g. [mp, exp, hs, hd, hp])
+# j: select the shock of interest
+# e.g. we want to know how mp shock affects hp
+make_HD_plot_dataframe <- function(i,   # variable of interest
+                                   j    # shock of interest
+                                   ) {
+  SVAR_HD_plot_temp <- bind_cols(
+    BaseLine = (By-SVAR_AB_Hist.c0)[, i], # represent the bias, i.e. turn on all shocks
+    Shock = SVAR_AB_HistDecomp[, num_var*(i - 1) + j ] # turn on only one shock
+    ) 
+  return(SVAR_HD_plot_temp)
+}
+
+
+
+#' @description Obtain HD table by subetting specific year-quarter
+get_HD.table <- function(df_HD.table, 
+                         year_start, season_start,
+                         year_end, season_end){
+  HD_seq.temp <- df_HD.table %>%
+    # filter by year
+    filter( Year >= year_start & Year <= year_end) %>%
+    # if in the same year, weed out quarters prior to the assigned quarter
+    filter( !(Year==year_start & Season < season_start) ) %>%
+    # same logic as above
+    filter( !(Year==year_end & Season > season_end) ) %>%
+    summarise(mp = median(mp),
+              exp = median(exp),
+              hs = median(hs),
+              hd = median(hd),
+              hp = median(hp))
+  return(HD_seq.temp)
+}

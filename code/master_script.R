@@ -1,5 +1,19 @@
 #' @title Master Script
 
+#' Dependencies
+library(plyr)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(ggplot2)
+require(matrixcalc)
+# library(Rmisc)
+library(lattice)
+library(cowplot)
+library(xtable)
+library(Rmisc)
+
+
 #' @section Pull data from several resources (hand collection)
 
 #' @section constructing sentiment index
@@ -36,4 +50,5 @@ source("./code/analysis/estimate_VD.R")
 source("./code/analysis/estimate_HD.R")
 
 # plot HD
+source("./code/analysis/plot_HD.R")
 
